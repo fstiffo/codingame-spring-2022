@@ -18,6 +18,8 @@ func FindBestCommands(bases []Base, monsters []Entity, heroes, opponents map[int
 			hero := NearestHero(monsters[i], hs)
 			HeroCommands[hero.id] = fmt.Sprintf("MOVE %d %d", x, y)
 			delete(hs, hero.id)
+
+			// Add a second hero if the monster is strong and a threat
 			if monsters[i].threatFor == 1 && monsters[i].health > 2 {
 				hero := NearestHero(monsters[i], hs)
 				HeroCommands[hero.id] = fmt.Sprintf("MOVE %d %d", x, y)
