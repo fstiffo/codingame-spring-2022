@@ -8,18 +8,19 @@ var HeroCommands = make(map[int]string)
 // Find best command for each hero
 func FindBestCommands(bases []Base, monsters []Entity, heroes, opponents map[int]Entity) {
 	SortMonsters(monsters, bases[0].x, bases[0].y)
+	hs := CopyMap(heroes)
 	for i := 0; i < len(monsters); i++ {
-		if len(heroes) == 0 {
+		if len(hs) == 0 {
 			break
 		}
 		x, y := MonsterFinalPosition(monsters[i])
 		if PositionInsideBoard(x, y) {
-			hero := NearestHero(monsters[i], heroes)
+			hero := NearestHero(monsters[i], hs)
 			HeroCommands[hero.id] = fmt.Sprintf("MOVE %d %d", x, y)
-			delete(heroes, hero.id)
+			delete(hs, hero.id)
 		}
 	}
-	for _, hero := range heroes {
+	for _, hero := range hs {
 		HeroCommands[hero.id] = "WAIT"
 	}
 

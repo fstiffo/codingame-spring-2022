@@ -51,7 +51,7 @@ func main() {
 
 		FindBestCommands(bases, monsters, heroes, opponents)
 
-		for i := 0; i < heroesPerPlayer; i++ {
+		for i := range heroes {
 
 			// In the first league: MOVE <x> <y> | WAIT; In later leagues: | SPELL <spellParams>;
 			fmt.Println(HeroCommands[i])

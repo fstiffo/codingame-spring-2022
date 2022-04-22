@@ -2,8 +2,8 @@ import re
 
 merged_code = ""
 imported_modules = set([])
-files_to_import = ["types", "topology", "bot", "debug",
-                   "utils", "main", ]
+files_to_import = ["types", "utils", "topology", "bot", "debug",
+                   "main", ]
 for filename in files_to_import:
     print(filename)
     with open(f"{filename}.go", "r") as f:
