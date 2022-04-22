@@ -13,3 +13,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Merged source code (remove the comment below to include it)
+codingame-spring-2022.merged.go
