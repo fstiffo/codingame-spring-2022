@@ -33,5 +33,5 @@ imported_modules_str += ")\n"
 
 merged_code = "package main\n\n" + imported_modules_str + merged_code
 
-with open("codingame-spring-2022.merged.go", "w") as f:
+with open("_codingame-spring-2022.merged.go", "w") as f:
     f.write(merged_code)
