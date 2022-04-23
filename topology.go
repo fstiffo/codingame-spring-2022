@@ -4,6 +4,8 @@ import "math"
 
 const BoardLength = 17630
 const BoardWidth = 9000
+const BoardCenterX = BoardLength / 2
+const BoardCenterY = BoardWidth / 2
 
 // Integer distance between two points
 func distance(x1, y1, x2, y2 int) int {
@@ -16,12 +18,12 @@ func PositionInsideBoard(x, y int) bool {
 }
 
 // Calculate monster's final position
-func MonsterFinalPosition(monster Entity) (int, int) {
+func MonsterFinalPosition(monster Monster) (int, int) {
 	return monster.x + monster.vx, monster.y + monster.vy
 }
 
 // Order monsters by distance to Base
-func SortMonsters(monsters []Entity, baseX, baseY int) {
+func SortMonsters(monsters []Monster, baseX, baseY int) {
 	for i := 0; i < len(monsters); i++ {
 		for j := i + 1; j < len(monsters); j++ {
 			if distance(monsters[i].x, monsters[i].y, baseX, baseY) > distance(monsters[j].x, monsters[j].y, baseX, baseY) {
@@ -32,7 +34,7 @@ func SortMonsters(monsters []Entity, baseX, baseY int) {
 }
 
 // Sort monsters by distance to Base and threat level
-func SortMonstersByThreat(monsters []Entity, baseX, baseY int) {
+func SortMonstersByThreat(monsters []Monster, baseX, baseY int) {
 	for i := 0; i < len(monsters); i++ {
 		for j := i + 1; j < len(monsters); j++ {
 			if distance(monsters[i].x, monsters[i].y, baseX, baseY) > distance(monsters[j].x, monsters[j].y, baseX, baseY) {
@@ -45,7 +47,7 @@ func SortMonstersByThreat(monsters []Entity, baseX, baseY int) {
 }
 
 // Find neareast hero to a monster
-func NearestHero(monster Entity, heroes map[int]Entity) Entity {
+func NearestHero(monster Monster, heroes map[int]Common) Common {
 	nearestHero := heroes[0]
 	for _, hero := range heroes {
 		if distance(monster.x, monster.y, hero.x, hero.y) < distance(monster.x, monster.y, nearestHero.x, nearestHero.y) {
@@ -53,4 +55,38 @@ func NearestHero(monster Entity, heroes map[int]Entity) Entity {
 		}
 	}
 	return nearestHero
+}
+
+// Find neareast monster to a hero
+func NearestMonster(hero Common, s State) (Monster, bool) {
+	nearestMonster := Monster{}
+	nearestMonster.id = -1
+	nearestMonster.x, nearestMonster.y = -BoardLength, -BoardWidth
+	monsters := s.monsters
+	for _, monster := range monsters {
+		if distance(hero.x, hero.y, monster.x, monster.y) < distance(hero.x, hero.y, nearestMonster.x, nearestMonster.y) {
+			nearestMonster = monster
+		}
+	}
+	return nearestMonster, (nearestMonster.id != -1)
+}
+
+// Find first monster near my base
+func NearBase(s State) (Monster, bool) {
+	for _, monster := range s.monsters {
+		if monster.nearBase {
+			return monster, true
+		}
+	}
+	return Monster{}, false
+}
+
+// Find first monster that is a threat for a base
+func ThreatMonster(base int, s State) (Monster, bool) {
+	for _, monster := range s.monsters {
+		if monster.threatFor == base {
+			return monster, true
+		}
+	}
+	return Monster{}, false
 }

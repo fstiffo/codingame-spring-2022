@@ -6,6 +6,9 @@ import (
 )
 
 func main() {
+	firstRound := true
+	var state State
+
 	// baseX: The corner of the map representing your base
 	var baseX, baseY int
 	fmt.Scan(&baseX, &baseY)
@@ -15,7 +18,7 @@ func main() {
 	fmt.Scan(&heroesPerPlayer)
 
 	for {
-		bases := make([]Base, 2) // Bases of each player, in the order your base, then opponent's base
+		var bases [2]Base // Bases of each player, in the order your base, then opponent's base
 		for i := 0; i < 2; i++ {
 			var health, mana int
 			fmt.Scan(&health, &mana)
@@ -30,26 +33,32 @@ func main() {
 		var entityCount int
 		fmt.Scan(&entityCount)
 
-		monsters := make([]Entity, entityCount-2*heroesPerPlayer)
-		heroes := make(map[int]Entity)
-		opponents := make(map[int]Entity)
+		monsters := make(map[int]Monster)
+		var heroes [3]Common
+		var opponents [3]Common
 
-		for monstersCount, i := 0, 0; i < entityCount; i++ {
+		for heroCount, opponentCount, i := 0, 0, 0; i < entityCount; i++ {
 			var id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor int
 			fmt.Scan(&id, &_type, &x, &y, &shieldLife, &isControlled, &health, &vx, &vy, &nearBase, &threatFor)
 			fmt.Fprintln(os.Stderr, _type, id, x, y, vx, vy)
 			switch _type {
 			case 0:
-				monsters[monstersCount] = NewEntity(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor)
-				monstersCount += 1
+				monsters[id] = NewMonster(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor)
 			case 1:
-				heroes[id] = NewEntity(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor)
+				heroes[heroCount] = NewCommon(id, _type, x, y, shieldLife, isControlled)
+				heroCount++
 			case 2:
-				opponents[id] = NewEntity(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor)
+				opponents[opponentCount] = NewCommon(id, _type, x, y, shieldLife, isControlled)
+				opponentCount++
 			}
 		}
+		if firstRound {
+			state = NewState(bases, monsters, heroes, opponents)
+		} else {
+			state.Update(bases, monsters, heroes, opponents)
+		}
 
-		FindBestCommands(bases, monsters, heroes, opponents)
+		FindBestCommands2(state)
 
 		for i := range heroes {
 
