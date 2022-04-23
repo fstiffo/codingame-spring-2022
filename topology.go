@@ -102,3 +102,8 @@ func ThreatMonster(base int, s State) (Monster, bool) {
 	}
 	return Monster{}, false
 }
+
+// Check if the hero is nearer to his base than the monster
+func HeroIsNearer(hero Common, monster Monster, s State) bool {
+	return distance(hero.x, hero.y, s.bases[0].x, s.bases[0].y) < distance(monster.x, monster.y, s.bases[0].x, s.bases[0].y)
+}

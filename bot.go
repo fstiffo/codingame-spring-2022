@@ -49,7 +49,7 @@ func FindBestCommandsForBack(s State) {
 	// If there is a monster near base, first try to push it away from base otherwise attack it
 	monster, ok := NearBase(s)
 	if ok {
-		if s.bases[0].mana > 9 {
+		if s.bases[0].mana > 9 && HeroIsNearer(s.heroes[BACK], monster, s) {
 			command = fmt.Sprintf("SPELL WIND %d %d", s.bases[1].x, s.bases[1].y)
 			goto done
 		} else {
@@ -140,7 +140,7 @@ func FindBestCommandsForFront(s State) {
 
 	// If there is a monster targeting the opponent's base, push it otherwise leave it alone
 	monster, ok = ThreatMonster(2, s)
-	if ok && s.bases[0].mana > 9 {
+	if ok && s.bases[0].mana > 9 && HeroIsNearer(s.heroes[FRONT], monster, s) {
 		command = fmt.Sprintf("SPELL WIND %d %d", s.bases[1].x, s.bases[1].y)
 		goto done
 	}
