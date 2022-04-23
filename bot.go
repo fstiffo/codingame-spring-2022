@@ -58,6 +58,13 @@ func FindBestCommandsForBack(s State) {
 			goto done
 		}
 	}
+
+	// If hero is too far from the base, move to it
+	if distance(s.heroes[BACK].x, s.heroes[BACK].y, s.bases[0].x, s.bases[0].y) > BackRadius {
+		command = fmt.Sprintf("MOVE %d %d", s.bases[0].x, s.bases[0].y)
+		goto done
+	}
+
 	// If hero have a target, go to it first
 	monster, ok = s.monsters[s.target[BACK]]
 	if ok {
@@ -67,12 +74,14 @@ func FindBestCommandsForBack(s State) {
 	// Else target the nearest monster
 	monster, ok = NearestMonster(s.heroes[BACK], s)
 	if ok {
-		command = fmt.Sprintf("MOVE %d %d", monster.x, monster.y)
-		s.target[1] = monster.id
+		if DistanceIsBetween(s.heroes[BACK].x, s.heroes[BACK].y, monster.x, monster.y, 0, BackRadius) {
+			command = fmt.Sprintf("MOVE %d %d", monster.x, monster.y)
+			s.target[1] = monster.id
+		}
 	}
 
 done:
-	HeroCommands[BACK] = command
+	HeroCommands[BACK] = command + " B"
 }
 
 // Find best command for the hero in the middle
@@ -101,7 +110,7 @@ func FindBestCommandsForMiddle(s State) {
 	}
 
 done:
-	HeroCommands[MIDDLE] = command
+	HeroCommands[MIDDLE] = command + " M"
 }
 
 // Find best command for the hero in front
@@ -129,5 +138,5 @@ func FindBestCommandsForFront(s State) {
 	}
 
 done:
-	HeroCommands[FRONT] = command
+	HeroCommands[FRONT] = command + " F"
 }

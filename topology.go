@@ -2,14 +2,26 @@ package main
 
 import "math"
 
-const BoardLength = 17630
-const BoardWidth = 9000
-const BoardCenterX = BoardLength / 2
-const BoardCenterY = BoardWidth / 2
+const (
+	BoardLength  = 17630
+	BoardWidth   = 9000
+	BoardCenterX = BoardLength / 2
+	BoardCenterY = BoardWidth / 2
+	BackRadius   = 5000
+)
+
+var FrontRadius = distance(0, 0, BoardLength, BoardWidth)
+var MiddleRadius = (FrontRadius + BackRadius) / 2
 
 // Integer distance between two points
 func distance(x1, y1, x2, y2 int) int {
 	return int(math.Sqrt(float64(x1-x2)*float64(x1-x2) + float64(y1-y2)*float64(y1-y2)))
+}
+
+// Distance between two points in between two values
+func DistanceIsBetween(x1, y1, x2, y2 int, d1, d2 int) bool {
+	d := distance(x1, y1, x2, y2)
+	return d >= d1 && d <= d2
 }
 
 // Position inside the board
