@@ -10,7 +10,7 @@ const (
 	BackRadius   = 5000
 )
 
-var FrontRadius = distance(0, 0, BoardLength, BoardWidth)
+var FrontRadius = distance(0, 0, BoardLength, BoardWidth) + 2500
 var MiddleRadius = (FrontRadius + BackRadius) / 2
 
 // Integer distance between two points
