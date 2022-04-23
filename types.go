@@ -58,8 +58,7 @@ func NewState(bases [2]Base, monsters map[int]Monster, heroes [3]Common, opponen
 		heroPtrs[i] = &v
 		i++
 	}
-	middleX := (bases[0].x + BoardCenterX) / 2
-	middleY := (bases[0].y + BoardCenterY) / 2
+	middleX, middleY := (bases[0].x+BoardCenterX)/2+500, (bases[0].y+BoardCenterY)/2+500
 	return State{bases, monsters, heroes, opponents, [3]int{-1, -1, -1}, middleX, middleY}
 }
 

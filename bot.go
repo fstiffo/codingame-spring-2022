@@ -95,6 +95,13 @@ func FindBestCommandsForMiddle(s State) {
 		command = fmt.Sprintf("MOVE %d %d", monster.x, monster.y)
 		goto done
 	}
+
+	// If hero is too far from the middle, move to it
+	if distance(s.heroes[MIDDLE].x, s.heroes[MIDDLE].y, s.middleX, s.middleY) > MiddleRadius {
+		command = fmt.Sprintf("MOVE %d %d", s.middleX, s.middleY)
+		goto done
+	}
+
 	// If there is a monster targeting my base, attack it
 	monster, ok = ThreatMonster(1, s)
 	if ok {
@@ -124,6 +131,13 @@ func FindBestCommandsForFront(s State) {
 		command = fmt.Sprintf("MOVE %d %d", monster.x, monster.y)
 		goto done
 	}
+
+	// If hero is too far from the front, move to it
+	if distance(s.heroes[FRONT].x, s.heroes[FRONT].y, BoardCenterX, BoardCenterY) > FrontRadius {
+		command = fmt.Sprintf("MOVE %d %d", BoardCenterX, BoardCenterY)
+		goto done
+	}
+
 	// If there is a monster targeting the opponent's base, push it otherwise leave it alone
 	monster, ok = ThreatMonster(2, s)
 	if ok && s.bases[0].mana > 9 {
