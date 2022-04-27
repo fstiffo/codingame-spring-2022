@@ -43,7 +43,8 @@ func NewMonster(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearB
 type State struct {
 	turn        int             // Current turn number
 	bases       [2]Base         // Your base and opponent's base
-	monsters    map[int]Monster // All monsters on the board
+	monsters    map[int]Monster // All visibile monsters on the board
+	sorted      []int           // Sorted list of monsters ids
 	heroes      [3]Common       // Your heroes
 	opponents   [3]Common       // Opponent's heroes
 	target      [3]int          // Your hero's target
@@ -66,7 +67,8 @@ func NewState(bases [2]Base, monsters map[int]Monster, heroes [3]Common, opponen
 		bottomRight = false
 		middleX, middleY = (bases[0].x+BoardCenterX)/2+500, (bases[0].y+BoardCenterY)/2+500
 	}
-	return State{0, bases, monsters, heroes, opponents, [3]int{-1, -1, -1}, bottomRight, middleX, middleY}
+	sorted := MonstersSortedByDistance(monsters, bases[0].x, bases[0].y)
+	return State{0, bases, monsters, sorted, heroes, opponents, [3]int{-1, -1, -1}, bottomRight, middleX, middleY}
 }
 
 // Update the state
@@ -74,6 +76,8 @@ func (s *State) Update(turn int, bases [2]Base, monsters map[int]Monster, heroes
 	s.turn = turn
 	s.bases = bases
 	s.monsters = monsters
+	sorted := MonstersSortedByDistance(monsters, bases[0].x, bases[0].y)
+	s.sorted = sorted
 	s.heroes = heroes
 	s.opponents = opponents
 }
