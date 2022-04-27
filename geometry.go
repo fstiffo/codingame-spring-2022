@@ -3,25 +3,51 @@ package main
 import "math"
 
 const (
-	BoardLength  = 17630
-	BoardWidth   = 9000
-	BoardCenterX = BoardLength / 2
-	BoardCenterY = BoardWidth / 2
-	BackRadius   = 5000
+	BoardLength                              = 17630
+	BoardWidth                               = 9000
+	BoardCenterX                             = BoardLength / 2
+	BoardCenterY                             = BoardWidth / 2
+	BackRadius                               = 5000
+	SpellRange                               = 2200
+	TglCenterStartX, TglCenterStartY         = 953, 953 // l*sqrt(3)/4 where l = SpellRange
+	_30DegInRadians                  float64 = math.Pi / 6
 )
 
-var FrontRadius = distance(0, 0, BoardLength, BoardWidth) + 2500
+var FrontRadius = dist(0, 0, BoardLength, BoardWidth) + 2500
 var MiddleRadius = (FrontRadius + BackRadius) / 2
+var DiagX, DiagY = norm(BoardLength, BoardWidth)
+
+// Normalize a 2D vector
+func norm(x, y int) (float64, float64) {
+	length := dist(0, 0, x, y)
+	return float64(x) / length, float64(y) / length
+
+}
 
 // Integer distance between two points
-func distance(x1, y1, x2, y2 int) int {
-	return int(math.Sqrt(float64(x1-x2)*float64(x1-x2) + float64(y1-y2)*float64(y1-y2)))
+func dist(x1, y1, x2, y2 int) float64 {
+	return math.Sqrt(float64(x1-x2)*float64(x1-x2) + float64(y1-y2)*float64(y1-y2))
 }
 
 // Distance between two points in between two values
 func DistanceIsBetween(x1, y1, x2, y2 int, d1, d2 int) bool {
-	d := distance(x1, y1, x2, y2)
-	return d >= d1 && d <= d2
+	d := dist(x1, y1, x2, y2)
+	return d >= float64(d1) && d <= float64(d2)
+}
+
+// Rotate a 2D vector by an angle with y axis
+func Rot(x, y float64, angle float64) (float64, float64) {
+	return x*math.Cos(angle) - y*math.Sin(angle), x*math.Sin(angle) + y*math.Cos(angle)
+}
+
+// Multiply a 2D vector by a scalar
+func Mul(x, y float64, scalar float64) (float64, float64) {
+	return x * scalar, y * scalar
+}
+
+// Add 2D vectors
+func Add(x1, y1, x2, y2 float64) (float64, float64) {
+	return x1 + x2, y1 + y2
 }
 
 // Position inside the board
@@ -38,7 +64,7 @@ func MonsterFinalPosition(monster Monster) (int, int) {
 func SortMonsters(monsters []Monster, baseX, baseY int) {
 	for i := 0; i < len(monsters); i++ {
 		for j := i + 1; j < len(monsters); j++ {
-			if distance(monsters[i].x, monsters[i].y, baseX, baseY) > distance(monsters[j].x, monsters[j].y, baseX, baseY) {
+			if dist(monsters[i].x, monsters[i].y, baseX, baseY) > dist(monsters[j].x, monsters[j].y, baseX, baseY) {
 				monsters[i], monsters[j] = monsters[j], monsters[i]
 			}
 		}
@@ -49,7 +75,7 @@ func SortMonsters(monsters []Monster, baseX, baseY int) {
 func SortMonstersByThreat(monsters []Monster, baseX, baseY int) {
 	for i := 0; i < len(monsters); i++ {
 		for j := i + 1; j < len(monsters); j++ {
-			if distance(monsters[i].x, monsters[i].y, baseX, baseY) > distance(monsters[j].x, monsters[j].y, baseX, baseY) {
+			if dist(monsters[i].x, monsters[i].y, baseX, baseY) > dist(monsters[j].x, monsters[j].y, baseX, baseY) {
 				monsters[i], monsters[j] = monsters[j], monsters[i]
 			} else if monsters[i].threatFor > monsters[j].threatFor {
 				monsters[i], monsters[j] = monsters[j], monsters[i]
@@ -62,7 +88,7 @@ func SortMonstersByThreat(monsters []Monster, baseX, baseY int) {
 func NearestHero(monster Monster, heroes map[int]Common) Common {
 	nearestHero := heroes[0]
 	for _, hero := range heroes {
-		if distance(monster.x, monster.y, hero.x, hero.y) < distance(monster.x, monster.y, nearestHero.x, nearestHero.y) {
+		if dist(monster.x, monster.y, hero.x, hero.y) < dist(monster.x, monster.y, nearestHero.x, nearestHero.y) {
 			nearestHero = hero
 		}
 	}
@@ -76,7 +102,7 @@ func NearestMonster(hero Common, s State) (Monster, bool) {
 	nearestMonster.x, nearestMonster.y = -BoardLength, -BoardWidth
 	monsters := s.monsters
 	for _, monster := range monsters {
-		if distance(hero.x, hero.y, monster.x, monster.y) < distance(hero.x, hero.y, nearestMonster.x, nearestMonster.y) {
+		if dist(hero.x, hero.y, monster.x, monster.y) < dist(hero.x, hero.y, nearestMonster.x, nearestMonster.y) {
 			nearestMonster = monster
 		}
 	}
@@ -105,5 +131,5 @@ func ThreatMonster(base int, s State) (Monster, bool) {
 
 // Check if the hero is nearer to his base than the monster
 func HeroIsNearer(hero Common, monster Monster, s State) bool {
-	return distance(hero.x, hero.y, s.bases[0].x, s.bases[0].y) < distance(monster.x, monster.y, s.bases[0].x, s.bases[0].y)
+	return dist(hero.x, hero.y, s.bases[0].x, s.bases[0].y) < dist(monster.x, monster.y, s.bases[0].x, s.bases[0].y)
 }

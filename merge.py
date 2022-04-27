@@ -2,7 +2,7 @@ import re
 
 merged_code = ""
 imported_modules = set([])
-files_to_import = ["types", "utils", "topology", "bot", "debug",
+files_to_import = ["types", "utils", "geometry", "bot", "debug",
                    "main", ]
 for filename in files_to_import:
     print(filename)

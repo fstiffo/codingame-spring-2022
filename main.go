@@ -54,11 +54,14 @@ func main() {
 		}
 		if firstRound {
 			state = NewState(bases, monsters, heroes, opponents)
-		} else {
-			state.Update(bases, monsters, heroes, opponents)
-		}
+			firstRound = false
 
-		FindBestCommands2(state)
+		} else {
+			state.Update(state.turn+1, bases, monsters, heroes, opponents)
+		}
+		fmt.Fprintln(os.Stderr, "State turn:", state.turn)
+
+		state.FindBestCommands()
 
 		for i := range heroes {
 

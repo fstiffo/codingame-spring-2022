@@ -41,13 +41,15 @@ func NewMonster(id, _type, x, y, shieldLife, isControlled, health, vx, vy, nearB
 }
 
 type State struct {
-	bases     [2]Base         // Your base and opponent's base
-	monsters  map[int]Monster // All monsters on the board
-	heroes    [3]Common       // Your heroes
-	opponents [3]Common       // Opponent's heroes
-	target    [3]int          // Your hero's target
-	middleX   int             // The middle point beetween your base and the center of the board
-	middleY   int
+	turn        int             // Current turn number
+	bases       [2]Base         // Your base and opponent's base
+	monsters    map[int]Monster // All monsters on the board
+	heroes      [3]Common       // Your heroes
+	opponents   [3]Common       // Opponent's heroes
+	target      [3]int          // Your hero's target
+	bottomRight bool            // true=My base at bottom-right corner, false=My base at top-left corner
+	middleX     int             // The middle point beetween your base and the center of the board
+	middleY     int
 }
 
 // Create a new State
@@ -58,12 +60,18 @@ func NewState(bases [2]Base, monsters map[int]Monster, heroes [3]Common, opponen
 		heroPtrs[i] = &v
 		i++
 	}
-	middleX, middleY := (bases[0].x+BoardCenterX)/2+500, (bases[0].y+BoardCenterY)/2+500
-	return State{bases, monsters, heroes, opponents, [3]int{-1, -1, -1}, middleX, middleY}
+	bottomRight := true // My base at bottom-right corner
+	middleX, middleY := (bases[1].x+BoardCenterX)/2+500, (bases[1].y+BoardCenterY)/2+500
+	if bases[0].x == 0 { // My base at top-left corner
+		bottomRight = false
+		middleX, middleY = (bases[0].x+BoardCenterX)/2+500, (bases[0].y+BoardCenterY)/2+500
+	}
+	return State{0, bases, monsters, heroes, opponents, [3]int{-1, -1, -1}, bottomRight, middleX, middleY}
 }
 
 // Update the state
-func (s *State) Update(bases [2]Base, monsters map[int]Monster, heroes [3]Common, opponents [3]Common) {
+func (s *State) Update(turn int, bases [2]Base, monsters map[int]Monster, heroes [3]Common, opponents [3]Common) {
+	s.turn = turn
 	s.bases = bases
 	s.monsters = monsters
 	s.heroes = heroes
